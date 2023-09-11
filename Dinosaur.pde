@@ -1,13 +1,33 @@
 public class Dinosaur{
-  float x,y,closest,direction;
+
+  float x,y,closest,direction, closestFoe, closestFood, index;
+
+
   
-  Dinosaur(float x,float y){
+  Dinosaur(float x,float y, float i){
     this.x = x;
     this.y = y;
     this.closest = 999999;
+    this.closestFood = 999999;
+    this.closestFoe = 999999;
     this.direction = 0;
+    this.index = i;
   }
-  
+  public void update(ArrayList<Food> foods){
+      Food[] arr = new Food[foods.size()];
+      arr = foods.toArray(arr);
+      this.update(arr) ;
+  }
+  public void update(Food foods[]){
+      this.show();
+      float oldDistance = this.closest;
+      float distance = this.getClosestFood(foods);
+      if(distance>oldDistance){
+        this.direction = random(TWO_PI);
+      }
+      this.move(this.direction,distance/2.0);   
+  }
+
   public void show(){
     fill(255,0,0);
     noStroke();
