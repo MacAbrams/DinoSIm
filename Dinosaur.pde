@@ -1,6 +1,6 @@
 public class Dinosaur{
 
-  float x,y,closest,direction, closestFoe, closestFood, index, stomache;
+  float x,y,closest,direction, closestFoe, closestFood, index, stomache, energy, maxSpeed ,efficiency;
 
   
   Dinosaur(float x,float y, float i){
@@ -11,7 +11,10 @@ public class Dinosaur{
     this.closestFoe = 999999;
     this.direction = 0;
     this.index = i;
-    this.stomache = 1;
+    this.stomache = 0;
+    this.energy = 10;
+    this.maxSpeed = 1;
+    this.efficiency = 10;
   }
   public void update(ArrayList<Food> foods){
       Food[] arr = new Food[foods.size()];
@@ -23,8 +26,9 @@ public class Dinosaur{
       this.show();
       vec2 nav = this.navigate(foods);
       this.move(nav);
+      this.consume(foods);
+      this.digest();
     }
-
   }
 
   private vec2 navigate(Food[] foods){
@@ -49,8 +53,10 @@ public class Dinosaur{
   }
   
   public void consume(Food[] foods){
-    int i = this.getClosestFood(foods);
-    this.stomache += foods[i].eat();
+    Food f = this.getClosestFood(foods);
+    if(f.getDistance(this.x,this.y)<0.01){
+      this.stomache += f.eat();
+    }
 
   }
 
@@ -63,32 +69,39 @@ public class Dinosaur{
     }
     return this.closest;
   }
-  public int getClosestFood(Food plants[]){
-    this.closest = 999999;
+  public Food getClosestFood(Food plants[]){
+    float closest = 999999;
     int index=0;
     for(int i=0;i<plants.length;i++){
       float distance = plants[i].getDistance(this.x,this.y);
-      if(this.closest>distance){
-        this.closest = distance;
-        index = i
+      if(closest>distance){
+        closest = distance;
+        index = i;
       }
     }
-    return index;
+    return plants[index];
   }
   public void move(vec2 pol){
-    this.x += pol.y * cos(pol.x);
-    this.y += pol.y * sin(pol.x);
+    this.move(pol.x,pol.y);
   }
   public void move(float angle,float distance){
+    distance = min(this.maxSpeed, distance);
     this.x += distance * cos(angle);
     this.y += distance * sin(angle);
+    this.energy-=distance/this.efficiency;
   }
 
   public boolean isAlive(){
-    if(this.stomache<=0){
+    if(this.energy<=0){
       return false;
     }
     return true;
   }
-  
+  private void digest(){
+    if(this.stomache>0){
+    this.stomache-=1;
+    }
+    this.energy+=0.5;
+  }
+
 }
