@@ -13,7 +13,7 @@ public class Dinosaur{
     this.index = i;
     this.stomache = 0;
     this.energy = 10;
-    this.maxSpeed = 1;
+    this.maxSpeed = 10;
     this.efficiency = 10;
   }
   public void update(ArrayList<Food> foods){
@@ -30,7 +30,7 @@ public class Dinosaur{
       this.digest();
     }
   }
-
+  //needs work
   private vec2 navigate(Food[] foods){
 
     float oldSmell = this.closest;
@@ -39,7 +39,7 @@ public class Dinosaur{
       this.direction = random(TWO_PI);
     }
 
-    return new vec2(this.direction,this.maxSpeed/smell);
+    return new vec2(this.direction,this.maxSpeed/(smell/2));
   }
 
   public void show(){
@@ -62,7 +62,7 @@ public class Dinosaur{
   public float getFoodSmell(Food plants[]){
     float smell = 0;
     for(int i=0;i<plants.length;i++){
-      smell += pow(plants[i].getSmell(this.x,this.y),1.5);
+      smell += plants[i].getSmell(this.x,this.y);
     }
     return smell;
   }

@@ -38,7 +38,8 @@ class Food{
 
   public float getSmell(float x,float y){
     float distance = this.getDistance(x,y);
-    return this.growth/distance;
+    // return this.growth/(distance);
+    return 1/(distance);
   }
   public float eat(){
     if(isAlive){

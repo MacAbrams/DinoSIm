@@ -28,7 +28,7 @@ void main(){
         vec2 position = (texture(foods, vec2(i,1)).xy);
         float d = length(gl_FragCoord.xy - position*resolution.xy );
         // smell = (d<0.01)?1.:smell;
-        smell+=1./(d*d);
+        smell+=1./pow(d,1.);
     }
 
 
