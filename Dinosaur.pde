@@ -33,13 +33,13 @@ public class Dinosaur{
 
   private vec2 navigate(Food[] foods){
 
-    float oldDistance = this.closest;
-    float distance = this.getFoodDist(foods);
-    if(distance>oldDistance){
+    float oldSmell = this.closest;
+    float smell = this.getFoodSmell(foods);
+    if(smell<oldSmell){
       this.direction = random(TWO_PI);
     }
 
-    return new vec2(this.direction,distance/2);
+    return new vec2(this.direction,this.maxSpeed/smell);
   }
 
   public void show(){
@@ -58,6 +58,13 @@ public class Dinosaur{
       this.stomache += f.eat();
     }
 
+  }
+  public float getFoodSmell(Food plants[]){
+    float smell = 0;
+    for(int i=0;i<plants.length;i++){
+      smell += pow(plants[i].getSmell(this.x,this.y),1.5);
+    }
+    return smell;
   }
 
   public float getFoodDist(Food plants[]){
