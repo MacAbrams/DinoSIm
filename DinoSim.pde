@@ -30,8 +30,8 @@ void setup() {
 }
 
 void draw() {
-  background(220);
-  image(data, 0, 0, width, height);
+  background(0);
+  // image(data, 0, 0, width, height);
   shader(program);
   program.set("foods", data);
   program.set("numFoods", 100);
