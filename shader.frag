@@ -20,17 +20,13 @@ void main(){
     vec2 uv = gl_FragCoord.xy/resolution;
     float texCoord = floor(uv.x*100.)/100.;
 
-    // uv*=256;
-
     vec3 color= vec3(0.);
     float smell=0.0;
     for(float i=0.0;i<=1.0;i+=1./100.){
         vec2 position = (texture(foods, vec2(i,1)).xy);
         float d = length(gl_FragCoord.xy - position*resolution.xy );
-        // smell = (d<0.01)?1.:smell;
         smell+=1./pow(d,1.);
     }
 
-
-    gl_FragColor = vec4(  0., smell  ,0.,1.);
+    gl_FragColor = vec4(  0., 1.  ,0.,smell);
 }
