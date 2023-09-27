@@ -1,20 +1,30 @@
 public class Dinosaur{
 
-  float x,y,closest,direction, closestFoe, closestFood, index, stomache, energy, maxSpeed ,efficiency;
+  float x,y,closest,direction, closestFoe, closestFood,prevClosestFood, distanceMoved, index, stomache, energy, maxSpeed ,efficiency;
+  DNA dna = new DNA();
+  int neuralStart;
 
-  
   Dinosaur(float x,float y, float i){
+
     this.x = x;
     this.y = y;
     this.closest = 999999;
     this.closestFood = 999999;
+    this.prevClosestFood = 999999;
+    this.distanceMoved = 0;
     this.closestFoe = 999999;
     this.direction = 0;
     this.index = i;
     this.stomache = 0;
     this.energy = 10;
-    this.maxSpeed = 10;
-    this.efficiency = 10;
+    this.maxSpeed = dna.genes[0]+1.1;
+    this.efficiency = 0.1;
+    this.neuralStart = 2;
+    // this.size = dna.genes[2];
+    // this.red = dna.genes[2];
+    // this.green = dna.genes[2];
+    // this.blue = dna.genes[2];
+
   }
   public void update(ArrayList<Food> foods){
       Food[] arr = new Food[foods.size()];
@@ -24,22 +34,117 @@ public class Dinosaur{
   public void update(Food foods[]){
     if(this.isAlive()){
       this.show();
-      vec2 nav = this.navigate(foods);
-      this.move(nav);
-      this.consume(foods);
+      this.getFoodSmell(foods);
+      this.decide(foods);
       this.digest();
+      this.prevClosestFood = this.closestFood;
     }
   }
   //needs work
-  private vec2 navigate(Food[] foods){
+  private void decide(Food[] foods){
+    //genes layout
+    //bias as first value
+    /* 
+      number of hidden layers 1 - 3
+      number of nodes in first layer 3-5
+      number of nodes in second layer (disabled)
+      ...
+    first layer 4*5
+      weight  1-1
+      weight  1-2
+      weight  1-3
+      weight  1-4
+      bias    1-1
+      ...
+      weight  5-1
+      weight  5-2
+      weight  5-3
+      weight  5-4
+      bias    5-1
+    second layer 5*5
+      weight  1-1
+      weight  1-2
+      ...
+      weight  5-4
+      weight  5-5
+      bias    5-1
+    third layer 5*5
+      weight  1-1
+      weight  1-2
+      ...
+      weight  5-5
+      bias    5-1
 
-    float oldSmell = this.closest;
-    float smell = this.getFoodSmell(foods);
-    if(smell<oldSmell){
-      this.direction = random(TWO_PI);
+    output layer 5*4
+      weight  1-1
+      weight  1-2
+      ...
+      weight  4-5
+      bias    4-1
+
+    */
+
+
+    //neural net plan 
+    /*
+    ins:
+      nearest smell
+      last nearest smell
+      direction facing
+      distance moved
+
+    outs:
+      direction to face
+      distance to move
+      eat
+      reproduce
+
+    */
+    
+    int layers = 1+(int)((dna.genes[this.neuralStart]+1.0)*1.5) ;
+    int layerOneNeruons = 3+(int)((dna.genes[this.neuralStart+1]+1.0)*1.5) ;
+    int layerTwoNeruons = 3+(int)((this.dna.genes[this.neuralStart+2]+1.0)*1.5) ;
+    int layerThreeNeruons = 3+(int)((this.dna.genes[this.neuralStart+3]+1.0)*1.5) ;
+
+    float inputs[] = {this.closestFood,this.prevClosestFood, this.direction, this.distanceMoved };
+    float outputs[] = new float[4];
+    float layer1[] = new float[layerOneNeruons];
+    float layer2[] = new float[layerTwoNeruons];
+    float layer3[] = new float[layerTwoNeruons];
+
+    int index = this.neuralStart+4;
+    for(int i=0;i<layer1.length;i++){
+      layer1[i] = this.dna.genes[index];
+      index++;
+      for(int j=0;j<inputs.length;j++){
+        layer1[i] += this.dna.genes[index] * inputs[j];
+        index++;
+      }
+      layer1[i] = activation(layer1[i]);
+    }
+    // if(layers == 1){
+      for(int i=0;i<outputs.length;i++){
+        outputs[i] = this.dna.genes[index];
+        index++;
+        for(int j=0;j<layer1.length;j++){
+          outputs[i] += this.dna.genes[index] * layer1[j];
+          index++;
+        }
+      }
+    // }
+    this.direction = outputs[0]*PI;
+    float distance = max(min(outputs[1],1),0)*maxSpeed;
+    if(outputs[2]>0.5){
+      this.consume(foods);
     }
 
-    return new vec2(this.direction,this.maxSpeed/(smell/2));
+
+    this.move(this.direction, distance);
+
+  }
+
+  private float activation(float a){
+    return max(0,a);
   }
 
   public void show(){
@@ -92,10 +197,15 @@ public class Dinosaur{
     this.move(pol.x,pol.y);
   }
   public void move(float angle,float distance){
+    this.direction = angle;
+    this.move(distance);
+  }
+  public void move(float distance){
     distance = min(this.maxSpeed, distance);
-    this.x += distance * cos(angle);
-    this.y += distance * sin(angle);
+    this.x += distance * cos(this.direction);
+    this.y += distance * sin(this.direction);
     this.energy-=distance/this.efficiency;
+    this.distanceMoved=distance;
   }
 
   public boolean isAlive(){

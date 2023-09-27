@@ -43,11 +43,27 @@ void draw() {
   for(int i=0;i<foods.size();i++){
     foods.get(i).update();
   }
-  
+  int alive = 0;
   for(int i = 0; i<dinos.size(); i++){
     dinos.get(i).update(foods);
     dinos.get(i).x = (dinos.get(i).x+width)%width;
     dinos.get(i).y = (dinos.get(i).y+height)%height;
+    if(dinos.get(i).isAlive()){
+      alive++;
+    }
+  }
+  if(alive<=30){
+    Dinosaur matingPool[] = new Dinosaur[alive];
+    int ind = 0;
+    for(int i = 0; i<dinos.size(); i++){
+      if(dinos.get(i).isAlive()){
+        matingPool[ind] = dinos.get(i);
+        ind++;
+      }
+    }
+
+    noLoop();
+
   }
   
 }

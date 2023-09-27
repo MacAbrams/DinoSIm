@@ -1,5 +1,5 @@
 public class DNA{
-    float[] genes = new float[18];
+    float[] genes = new float[109+4];
     float fitness;
 
     DNA(){
@@ -30,12 +30,12 @@ public class DNA{
     }
 
     void fitness(){
-        int score = 0;
-        for (int i = 0;i<genes.length;i++){
-            if(genes[i] == target.charAt(i)){
-                score++;
-            }
-        }
-        this.fitness = float(score)/target.length();
+        // int score = 0;
+        // for (int i = 0;i<genes.length;i++){
+        //     if(genes[i] == target.charAt(i)){
+        //         score++;
+        //     }
+        // }
+        // this.fitness = float(score)/target.length();
     }
 }
